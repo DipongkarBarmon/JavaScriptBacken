@@ -2,7 +2,7 @@
 import mongoose,{Schema} from "mongoose";
 import bcrypt from "bcrypt"
 import JWT from 'jsonwebtoken'
-import { useState } from "react";
+ 
 
 
 const userSchema=new Schema({
@@ -30,7 +30,7 @@ const userSchema=new Schema({
         index:true
     },
     avater:{
-      type:String,//cloudUrl
+      type:String,
         required:true,
     },
     coverImage:{
@@ -52,14 +52,12 @@ const userSchema=new Schema({
     }
 },{timestamps:true});
 
-userSchema.pre('save',async function (next) {
-     const user=this;
-     if(!user.isModified('password')){
-      return next();
-     }
-     const hassPasword=bcrypt.hash(user.password,10);
-     this.password=hassPasword;
-     next()
+userSchema.pre('save', async function () {
+  if (!this.isModified('password')) {
+   return;
+  }
+  const hashedPassword = await bcrypt.hash(this.password, 10);
+  this.password = hashedPassword;
 });
 
 userSchema.methods.isPasswordCorrect=async function(password) {
